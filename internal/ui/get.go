@@ -5,6 +5,7 @@ import (
 	"remembrall/internal/auth"
 	"remembrall/internal/crypto"
 	"remembrall/internal/db"
+	"remembrall/internal/search"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -46,10 +47,36 @@ func getPassword(appName string) error {
 	}
 	defer store.Close()
 
-	// Get encrypted password from database
+	// Try exact match first
 	entry, err := store.Get(appName)
 	if err != nil {
-		return fmt.Errorf("failed to retrieve from database: %w", err)
+		// If exact match fails, try fuzzy search
+		allEntries, listErr := store.List()
+		if listErr != nil {
+			return fmt.Errorf("failed to retrieve from database: %w", err)
+		}
+
+		bestMatch := search.FindBestMatch(allEntries, appName)
+		if bestMatch == nil {
+			// Show similar matches if available
+			results := search.FuzzySearch(allEntries, appName)
+			if len(results) > 0 {
+				fmt.Printf("No exact match found for '%s'. Did you mean:\n", appName)
+				for i, result := range results {
+					if i >= 3 { // Show max 3 suggestions
+						break
+					}
+					fmt.Printf("  • %s\n", result.Entry.AppName)
+				}
+				return fmt.Errorf("use exact application name or try 'remembrall list' to see all stored passwords")
+			}
+			return fmt.Errorf("failed to retrieve from database: %w", err)
+		}
+
+		// Found a good match, ask for confirmation
+		fmt.Printf("No exact match found for '%s'.\n", appName)
+		fmt.Printf("Did you mean '%s'? Retrieving password for '%s'...\n\n", bestMatch.AppName, bestMatch.AppName)
+		entry = bestMatch
 	}
 
 	// Initialize encryptor with master password
