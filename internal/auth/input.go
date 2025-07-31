@@ -2,7 +2,6 @@ package auth
 
 import (
 	"fmt"
-	"os"
 	"strings"
 	"syscall"
 
