@@ -70,12 +70,7 @@ func searchPasswords(query string) error {
 	fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 
 	for i, result := range results {
-		matchType := getMatchTypeDescription(result.Score)
-		fmt.Printf("%2d. %-30s (%s, score: %d)\n", 
-			i+1, 
-			result.Entry.AppName, 
-			matchType,
-			result.Score)
+		fmt.Printf("%2d. %s\n", i+1, result.Entry.AppName)
 		
 		if i >= 9 { // Show max 10 results
 			fmt.Printf("    ... and %d more matches\n", len(results)-10)
@@ -87,25 +82,6 @@ func searchPasswords(query string) error {
 	fmt.Println("\nUse 'remembrall get <app-name>' to retrieve a password")
 
 	return nil
-}
-
-func getMatchTypeDescription(score int) string {
-	switch {
-	case score >= 100:
-		return "exact match"
-	case score >= 90:
-		return "prefix match"
-	case score >= 80:
-		return "contains"
-	case score >= 70:
-		return "subsequence"
-	case score >= 60:
-		return "word match"
-	case score >= 50:
-		return "similar"
-	default:
-		return "weak match"
-	}
 }
 
 func init() {
