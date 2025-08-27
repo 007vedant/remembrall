@@ -12,7 +12,7 @@ var rootCmd = &cobra.Command{
 	Short: "A secure CLI password manager",
 	Long: `Remembrall is a secure command-line password manager that helps you 
 store and retrieve passwords for various applications and websites.
-All passwords are stored in secure manner.`,
+All passwords are stored with highest security standards.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
 			cmd.Help()
