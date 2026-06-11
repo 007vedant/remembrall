@@ -9,18 +9,18 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
+	"golang.design/x/clipboard"
 )
 
 var getCmd = &cobra.Command{
 	Use:   "get <app-name>",
 	Short: "Retrieve a password for an application",
 	Long: `Retrieve a password for an application or website. You will be prompted
-to enter your system password for authentication. The password will be displayed
-for 5 seconds and then cleared from the terminal.`,
+to enter your system password for authentication. The password will be copied to clipboard.`,
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		appName := args[0]
-		
+
 		if err := getPassword(appName); err != nil {
 			exitWithError("Failed to retrieve password: %v", err)
 		}
@@ -81,26 +81,22 @@ func getPassword(appName string) error {
 
 	// Initialize encryptor with master password
 	encryptor := crypto.NewEncryptor(masterPassword)
-	
+
 	// Decrypt the password
 	decryptedPassword, err := encryptor.Decrypt(entry.Password)
 	if err != nil {
 		return fmt.Errorf("failed to decrypt password: %w", err)
 	}
 
-	// Display password with timeout
-	fmt.Printf("\nPassword for '%s':\n", appName)
-	fmt.Printf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
-	fmt.Printf("  %s\n", decryptedPassword)
-	fmt.Printf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
-	fmt.Println("\nPassword will be cleared in 5 seconds...")
-	
-	// Wait for 5 seconds
-	time.Sleep(5 * time.Second)
-	
-	// Clear the screen
+	if err := clipboard.Init(); err != nil {
+		return fmt.Errorf("failed to print password to clipboard: %w", err)
+	}
+
+	clipboard.Write(clipboard.FmtText, []byte(decryptedPassword))
+	fmt.Printf("\nPassword for '%s' is copied to clipboard!\n", appName)
+
+	time.Sleep(2 * time.Second)
 	auth.ClearScreen()
-	fmt.Println("Password cleared for security.")
 
 	return nil
 }

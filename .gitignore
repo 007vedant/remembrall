@@ -33,3 +33,6 @@ go.work
 *.swp
 *.swo
 
+# binaries
+remembrall
+

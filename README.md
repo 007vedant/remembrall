@@ -7,7 +7,7 @@ A secure CLI password manager written in Go that helps you store and retrieve pa
 - **AES-256-GCM encryption** with PBKDF2 key derivation
 - **Master password authentication** for all operations
 - **Hidden password input** (no shoulder surfing)
-- **5-second auto-clear** for retrieved passwords
+- **Copy to clipboard** for retrieved passwords
 - **SQLite database** stored securely in your home directory
 - **Fuzzy search** with intelligent matching
 
@@ -66,7 +66,7 @@ remembrall search git
 | Command | Description | Example |
 |---------|-------------|---------|
 | `save <app-name>` | Save a password for an application | `remembrall save gmail` |
-| `get <app-name>` | Retrieve a password (shows for 5 seconds) | `remembrall get gmail` |
+| `get <app-name>` | Retrieve a password (copies to clipboard) | `remembrall get gmail` |
 | `update <app-name>` | Update an existing password | `remembrall update gmail` |
 | `list` | List all stored applications | `remembrall list` |
 | `search <query>` | Search applications with fuzzy matching | `remembrall search gmai` |
